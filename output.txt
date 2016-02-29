@@ -1,19 +1,19 @@
 [Call] Hello
 [Return] There
-**Test Result: Pass
+**TestResult: Pass
 
 [Call] Hello
 [Return] There
-**Test Result: Fail
+**TestResult: Fail
 
 [Call] Hello
 [Return] There
-**Test Result: Pass
+**TestResult: Pass
 
 [Call] Hello
 [Return] There
-**Test Result: Fail
+**TestResult: Fail
 
 [Call] Hello
 [Return] There
-**Test Result: Pass
+**TestResult: Pass
