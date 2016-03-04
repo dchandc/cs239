@@ -76,9 +76,11 @@ for line in args.output_file:
 				all_method_stats[key].num_failed += 1 
 		current_method_stats = {}
 
-for key in all_method_stats:
-	print all_method_stats[key]
-	stats = all_method_stats[key]
-	print calculateSS(stats.num_passed, total_passed, stats.num_failed, total_failed)
+with open('scores.csv', 'w+') as f:
+	for key in all_method_stats:
+		print all_method_stats[key]
+		stats = all_method_stats[key]
+		scores = calculateSS(stats.num_passed, total_passed, stats.num_failed, total_failed)
+		f.write('{0},{1},{2},{3},{4},{6:.2f},{6:.2f},{7:.2f},{8:.2f}\n'.format(key, stats.num_passed, total_passed, stats.num_failed, total_failed, scores['Tarantula'], scores['SBI'], scores['Jaccard'], scores['Ochiai']))
 
 print 'Totals - passed: ' + str(total_passed) + ', failed: ' + str(total_failed)
