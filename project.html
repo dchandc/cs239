@@ -10,35 +10,30 @@
 		var svgWidth = 960;
 		var svgHeight = 500;
 
-		var zoom = d3.behavior.zoom();
+		var zoom = d3.behavior.zoom()
+				.scaleExtent([1, 8])
+				.on("zoom", zoomed);
 
 		var svg = d3.select("body")
 			.append("svg")
 			.attr("width", svgWidth)
 			.attr("height", svgHeight)
-			.call(d3.behavior.zoom().on("zoom", function () {
-    				svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-  			}))
-  .append("g")
+			.attr("align", "center")
+			.style("margin", "auto")
+			.style("display", "block")
+			.call(zoom)
+  			.append("g")
+
+		function zoomed() {
+			var tx = Math.min(0, Math.max(d3.event.translate[0], svgWidth - svgWidth * d3.event.scale));
+			var ty = Math.min(0, Math.max(d3.event.translate[1], svgHeight - svgHeight * d3.event.scale));
+			zoom.translate([tx, ty]);
+    			svg.attr("transform", "translate(" + [tx, ty] + ")" + " scale(" + d3.event.scale + ")")
+		}
 
 		var color = d3.scale.linear()
 			.domain([0, 0.5, 1])
 			.range(["green", "yellow", "red"]);
-
-/*
-		svg.append("rect")
-			.attr("width", 10)
-			.attr("height", 10)
-			.attr("fill", d3.rgb(color(.5)).darker(1))
-			.append("title").text("HELLO");
-
-		svg.append("rect")
-			.attr("x", 10)
-			.attr("width", 10)
-			.attr("height", 10)
-			.attr("fill", d3.rgb(color(0)).darker(0.5))
-			.append("title").text("HELLO2");
-*/
 
 		d3.csv("scores.csv", function(dataset) {
 			var classes = {};
@@ -58,6 +53,13 @@
 			console.log(classes);
 			var current_score_type = 'tarantula';
 			var class_index = 0;
+			var class_count = 0;
+			var max_method_count = 0;
+			for (var key in classes) {
+				class_count++;
+				max_method_count = Math.max(max_method_count, classes[key].length);
+			}
+			console.log(max_method_count);
 			for (var key in classes) {
 				classes[key].sort(function(a, b) {
 					var score_a = a[current_score_type];
@@ -71,20 +73,21 @@
 					}
 				});
 				
-				console.log(classes[key]);	
+				//console.log(classes[key]);	
 				svg.append("g").selectAll("rect")
 					.data(classes[key]).enter()
 					.append("rect")
-					.attr("width", 10)
+					.attr("width", svgWidth / max_method_count)
 					.attr("height", 10)
 					.attr("x", function(d, i) {
-						return i * 10;
+						return i * svgWidth / max_method_count;
 					})
 					.attr("y", class_index * 10)
 					.attr("fill", function(d, i) {
-						console.log(d[current_score_type]);
+						//console.log(d[current_score_type]);
 						return d3.rgb(color(d[current_score_type]));
-					});
+					})
+					.attr("stroke", "black");
 				
 				class_index++;
 			}
