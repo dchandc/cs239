@@ -12,21 +12,21 @@ def calculateSS(num_passed, total_passed, num_failed, total_failed):
 	pct_failed = float(num_failed) / float(total_failed)
 
 	if num_passed > 0 or num_failed > 0:
-		scores['Tarantula'] = pct_failed / (pct_passed + pct_failed)
+		scores['tarantula'] = pct_failed / (pct_passed + pct_failed)
 	else:
-		scores['Tarantula'] = -1
+		scores['tarantula'] = -1
 
 	if num_passed > 0 or num_failed > 0:
-		scores['SBI'] = float(num_failed) / float(num_passed + num_failed)
+		scores['sbi'] = float(num_failed) / float(num_passed + num_failed)
 	else:
-		scores['SBI'] = -1
+		scores['sbi'] = -1
 
-	scores['Jaccard'] = float(num_failed) / float(total_failed + num_passed)
+	scores['jaccard'] = float(num_failed) / float(total_failed + num_passed)
 
 	if num_passed > 0 or num_failed > 0:
-		scores['Ochiai'] = float(num_failed) / math.sqrt(total_failed * (num_passed + num_failed))
+		scores['ochiai'] = float(num_failed) / math.sqrt(total_failed * (num_passed + num_failed))
 	else:
-		scores['Ochiai'] = -1	
+		scores['ochiai'] = -1
 
 	return scores
 
@@ -87,11 +87,12 @@ for line in args.output_file:
 		current_method_stats = {}
 
 with open('scores.csv', 'w+') as f:
+	f.write('class,method,num_passed,total_passed,num_failed,total_failed,tarantula,sbi,jaccard,ochiai\n')
 	for class_name in all_method_stats:
 		for method_name in all_method_stats[class_name]:
-			print all_method_stats[class_name][method_name]
+#			print all_method_stats[class_name][method_name]
 			method_stats = all_method_stats[class_name][method_name]
 			scores = calculateSS(method_stats.num_passed, total_passed, method_stats.num_failed, total_failed)
-			f.write('{0},{1},{2},{3},{4},{5},{6:.2f},{7:.2f},{8:.2f},{9:.2f}\n'.format(class_name, method_name, method_stats.num_passed, total_passed, method_stats.num_failed, total_failed, scores['Tarantula'], scores['SBI'], scores['Jaccard'], scores['Ochiai']))
+			f.write('{0},{1},{2},{3},{4},{5},{6:.2f},{7:.2f},{8:.2f},{9:.2f}\n'.format(class_name, method_name, method_stats.num_passed, total_passed, method_stats.num_failed, total_failed, scores['tarantula'], scores['sbi'], scores['jaccard'], scores['ochiai']))
 
-print 'Totals - passed: ' + str(total_passed) + ', failed: ' + str(total_failed)
+#print 'Totals - passed: ' + str(total_passed) + ', failed: ' + str(total_failed)
