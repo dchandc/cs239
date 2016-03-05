@@ -1,14 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Project Part B</title>
-        <script src="d3.v3.min.js" charset="utf-8"></script>
-    </head>
-    <body>
-        <script type="text/javascript">
+	<style>
+		.d3-tip {
+			line-height: 1;
+			padding: 10px;
+			background: rgba(0, 0, 0, 0.75);
+			color: #fff;
+			border-radius: 2px;
+			font-size: 12px;
+			font-family: sans-serif;
+		}
+	</style>
+	<head>
+		<meta charset="utf-8">
+		<title>Project Part B</title>
+		<script src="d3.v3.min.js" charset="utf-8"></script>
+		<script src="d3-tip.min.js" charset="utf-8"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
 		var width = 960;
 		var height = 500;
+
+		var tip = d3.tip()
+			.attr("class", "d3-tip")
+			.direction('se')
+			.html(function(d) {
+				return "Class: " + d.class + "<br>Method: " + d.method + "<br>Passed: " + d.num_passed + "/" + d.total_passed + "<br>Failed: " + d.num_failed + "/" + d.total_failed + "<br>Tarantula score: " + d.tarantula + "<br>SBI score: " + d.sbi + "<br>Jaccard score: " + d.jaccard + "<br>Ochiai score: " + d.ochiai;
+			});
 
 		var div = d3.select("body").append("div")
 			.style("width", width + "px")
@@ -28,7 +47,8 @@
 			.style("margin", "auto")
 			.style("display", "block")
 			.call(zoom)
-  			.append("g");
+			.call(tip)
+  			.append("g")
 
 		var buttonDiv = d3.select("body").append("div")
 			.style("width", width + "px")
@@ -97,7 +117,9 @@
 					.attr("fill", function(d, i) {
 						return d3.rgb(color(d[initial_score_type]));
 					})
-					.attr("stroke", "black");
+					.attr("stroke", "black")
+					.on("mouseover", tip.show)
+					.on("mouseout", tip.hide);
 				
 				class_index++;
 			}
