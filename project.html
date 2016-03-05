@@ -19,147 +19,147 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-		var width = 960;
-		var height = 500;
-
-		var tip = d3.tip()
-			.attr("class", "d3-tip")
-			.direction('se')
-			.html(function(d) {
-				return "Class: " + d.class + "<br>Method: " + d.method + "<br>Passed: " + d.num_passed + "/" + d.total_passed + "<br>Failed: " + d.num_failed + "/" + d.total_failed + "<br>Tarantula score: " + d.tarantula + "<br>SBI score: " + d.sbi + "<br>Jaccard score: " + d.jaccard + "<br>Ochiai score: " + d.ochiai;
+			var width = 960;
+			var height = 500;
+	
+			var tip = d3.tip()
+				.attr("class", "d3-tip")
+				.direction('se')
+				.html(function(d) {
+					return "Class: " + d.class + "<br>Method: " + d.method + "<br>Passed: " + d.num_passed + "/" + d.total_passed + "<br>Failed: " + d.num_failed + "/" + d.total_failed + "<br>Tarantula score: " + d.tarantula + "<br>SBI score: " + d.sbi + "<br>Jaccard score: " + d.jaccard + "<br>Ochiai score: " + d.ochiai;
+				});
+	
+			var div = d3.select("body").append("div")
+				.style("width", width + "px")
+				.style("height", height + "px")
+				.style("margin", "auto")
+				.style("display", "block")
+				.style("border", "1px solid");
+	
+			var zoom = d3.behavior.zoom()
+					.scaleExtent([1, 8])
+					.on("zoom", zoomed);
+				
+			var svg = div.append("svg")
+				.attr("width", width)
+				.attr("height", height)
+				.attr("align", "center")
+				.style("margin", "auto")
+				.style("display", "block")
+				.call(zoom)
+				.call(tip)
+				.append("g")
+	
+			var buttonDiv = d3.select("body").append("div")
+				.style("width", width + "px")
+				.style("height", "20px")
+				.style("margin", "auto")
+				.style("text-align", "center")
+	
+			var score_types = ["Tarantula", "SBI", "Jaccard", "Ochiai"];
+			for (var i = 0; i < score_types.length; i++) {
+				buttonDiv.append("button")
+					.text(score_types[i])
+					.attr("onclick", 'update("' + score_types[i].toLowerCase() + '")')
+			}
+	
+			var color = d3.scale.linear()
+				.domain([0, 0.5, 1])
+				.range(["green", "yellow", "red"]);
+	
+			var classes = {};
+			var class_count = 0;
+			var max_method_count = 0;
+			d3.csv("scores.csv", function(dataset) {
+				for (var i = 0; i < dataset.length; i++) {
+					if (dataset[i].class.match(/^java/) || dataset[i].class.match(/^org\/w3c/)) {
+						dataset.splice(i--, 1);
+						continue;
+					}
+	
+					if (!(dataset[i].class in classes)) {
+						classes[dataset[i].class] = [];
+					}
+	
+					classes[dataset[i].class].push(dataset[i]);
+				}
+	
+				for (var key in classes) {
+					class_count++;
+					max_method_count = Math.max(max_method_count, classes[key].length);
+				}
+	
+				var initial_score_type = 'tarantula';
+				var class_index = 0;
+				for (var key in classes) {
+					classes[key].sort(function(a, b) {
+						var score_a = a[initial_score_type];
+						var score_b = b[initial_score_type];
+						if (score_a > score_b) {
+							return 1;
+						} else if (score_a < score_b) {
+							return -1;
+						} else {
+							return 0;
+						}
+					});
+					
+					svg.append("g").attr("id", key)
+						.selectAll("rect")
+						.data(classes[key]).enter()
+						.append("rect")
+						.attr("width", width / max_method_count)
+						.attr("height", height / class_count)
+						.attr("x", function(d, i) {
+							return i * width / max_method_count;
+						})
+						.attr("y", class_index * height / class_count)
+						.attr("fill", function(d, i) {
+							return d3.rgb(color(d[initial_score_type]));
+						})
+						.attr("stroke", "black")
+						.on("mouseover", tip.show)
+						.on("mouseout", tip.hide);
+					
+					class_index++;
+				}
 			});
-
-		var div = d3.select("body").append("div")
-			.style("width", width + "px")
-			.style("height", height + "px")
-			.style("margin", "auto")
-			.style("display", "block")
-			.style("border", "1px solid");
-
-		var zoom = d3.behavior.zoom()
-				.scaleExtent([1, 8])
-				.on("zoom", zoomed);
-			
-		var svg = div.append("svg")
-			.attr("width", width)
-			.attr("height", height)
-			.attr("align", "center")
-			.style("margin", "auto")
-			.style("display", "block")
-			.call(zoom)
-			.call(tip)
-  			.append("g")
-
-		var buttonDiv = d3.select("body").append("div")
-			.style("width", width + "px")
-			.style("height", "20px")
-			.style("margin", "auto")
-			.style("text-align", "center")
-
-		var score_types = ["Tarantula", "SBI", "Jaccard", "Ochiai"];
-		for (var i = 0; i < score_types.length; i++) {
-			buttonDiv.append("button")
-				.text(score_types[i])
-				.attr("onclick", 'update("' + score_types[i].toLowerCase() + '")')
-		}
-
-		var color = d3.scale.linear()
-			.domain([0, 0.5, 1])
-			.range(["green", "yellow", "red"]);
-
-		var classes = {};
-		var class_count = 0;
-		var max_method_count = 0;
-		d3.csv("scores.csv", function(dataset) {
-			for (var i = 0; i < dataset.length; i++) {
-				if (dataset[i].class.match(/^java/) || dataset[i].class.match(/^org\/w3c/)) {
-					dataset.splice(i--, 1);
-					continue;
+	
+			function zoomed() {
+				var tx = Math.min(0, Math.max(d3.event.translate[0], width - width * d3.event.scale));
+				var ty = Math.min(0, Math.max(d3.event.translate[1], height - height * d3.event.scale));
+				zoom.translate([tx, ty]);
+				svg.attr("transform", "translate(" + [tx, ty] + ")" + " scale(" + d3.event.scale + ")");
+			}
+	
+			function update(score_type) {
+				var class_index = 0;
+				for (var key in classes) {
+					classes[key].sort(function(a, b) {
+						var score_a = a[score_type];
+						var score_b = b[score_type];
+						if (score_a > score_b) {
+							return 1;
+						} else if (score_a < score_b) {
+							return -1;
+						} else {
+							return 0;
+						}
+					});
+	
+					svg.select('g[id="' + key + '"]').selectAll("rect")
+						.data(classes[key])
+						.transition()
+						.delay(0)
+						.duration(500)
+						.ease("linear")
+						.attr("fill", function(d, i) {
+							return d3.rgb(color(d[score_type]));
+						})
+					
+					class_index++;
 				}
-
-				if (!(dataset[i].class in classes)) {
-					classes[dataset[i].class] = [];
-				}
-
-				classes[dataset[i].class].push(dataset[i]);
 			}
-
-			for (var key in classes) {
-				class_count++;
-				max_method_count = Math.max(max_method_count, classes[key].length);
-			}
-
-			var initial_score_type = 'tarantula';
-			var class_index = 0;
-			for (var key in classes) {
-				classes[key].sort(function(a, b) {
-					var score_a = a[initial_score_type];
-					var score_b = b[initial_score_type];
-					if (score_a > score_b) {
-						return 1;
-					} else if (score_a < score_b) {
-						return -1;
-					} else {
-						return 0;
-					}
-				});
-				
-				svg.append("g").attr("id", key)
-					.selectAll("rect")
-					.data(classes[key]).enter()
-					.append("rect")
-					.attr("width", width / max_method_count)
-					.attr("height", height / class_count)
-					.attr("x", function(d, i) {
-						return i * width / max_method_count;
-					})
-					.attr("y", class_index * height / class_count)
-					.attr("fill", function(d, i) {
-						return d3.rgb(color(d[initial_score_type]));
-					})
-					.attr("stroke", "black")
-					.on("mouseover", tip.show)
-					.on("mouseout", tip.hide);
-				
-				class_index++;
-			}
-		});
-
-		function zoomed() {
-			var tx = Math.min(0, Math.max(d3.event.translate[0], width - width * d3.event.scale));
-			var ty = Math.min(0, Math.max(d3.event.translate[1], height - height * d3.event.scale));
-			zoom.translate([tx, ty]);
-    			svg.attr("transform", "translate(" + [tx, ty] + ")" + " scale(" + d3.event.scale + ")");
-		}
-
-		function update(score_type) {
-			var class_index = 0;
-			for (var key in classes) {
-				classes[key].sort(function(a, b) {
-					var score_a = a[score_type];
-					var score_b = b[score_type];
-					if (score_a > score_b) {
-						return 1;
-					} else if (score_a < score_b) {
-						return -1;
-					} else {
-						return 0;
-					}
-				});
-
-				svg.select('g[id="' + key + '"]').selectAll("rect")
-					.data(classes[key])
-					.transition()
-					.delay(0)
-					.duration(500)
-					.ease("linear")
-					.attr("fill", function(d, i) {
-						return d3.rgb(color(d[score_type]));
-					})
-				
-				class_index++;
-			}
-		}
-	</script>
-    </body>
+		</script>
+	</body>
 </html>   
