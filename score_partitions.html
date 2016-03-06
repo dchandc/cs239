@@ -13,7 +13,7 @@
 	</style>
 	<head>
 		<meta charset="utf-8">
-		<title>Project Part B</title>
+		<title>Score Partitions</title>
 		<script src="d3.v3.min.js" charset="utf-8"></script>
 	</head>
 	<body>
@@ -23,6 +23,13 @@
 			var margin = {top: 20, right: 20, bottom: 30, left: 40};
 			var graphWidth = width - margin.left - margin.right;
 			var graphHeight = height - margin.top - margin.bottom;
+
+			var titleDiv = d3.select("body").append("div")
+				.style("display", "block")
+				.style("text-align", "center")
+				.append("text")
+				.text("Score Partitions")
+				.style("font", "14px sans-serif")
 	
 			var div = d3.select("body").append("div")
 				.style("width", width + "px")

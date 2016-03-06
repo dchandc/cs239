@@ -16,7 +16,7 @@
 	</style>
 	<head>
 		<meta charset="utf-8">
-		<title>Project Part B</title>
+		<title>Class Spectrum</title>
 		<script src="d3.v3.min.js" charset="utf-8"></script>
 		<script src="d3-tip.min.js" charset="utf-8"></script>
 	</head>
@@ -24,7 +24,14 @@
 		<script type="text/javascript">
 			var width = 960;
 			var height = 500;
-	
+
+			var titleDiv = d3.select("body").append("div")
+				.style("display", "block")
+				.style("text-align", "center")
+				.append("text")
+				.text("Class Spectrum")
+				.style("font", "14px sans-serif")
+
 			var tip = d3.tip()
 				.attr("class", "d3-tip")
 				.direction('se')
