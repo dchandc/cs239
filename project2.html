@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 	<style>
+		body {
+			font: 12px sans-serif;
+		}
 		.axis path,
 		.axis line {
 			fill: none;
@@ -47,7 +50,7 @@
 				.range(["green", "yellow", "red"]);
 
 			var x = d3.scale.ordinal()
-				.rangeRoundBands([0, graphWidth], .1)
+				.rangeRoundBands([0, graphWidth], .25)
 				.domain(scoreTypes);
 
 			var y = d3.scale.linear()
@@ -65,11 +68,13 @@
 			svg.append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + graphHeight + ")")
-				.call(xAxis);
+				.call(xAxis)
 
 			svg.append("g")
 				.attr("class", "y axis")
-				.call(yAxis);
+				.call(yAxis)
+				.append("text")
+				.text("%")
 	
 			d3.csv("scores.csv", function(dataset) {
 				for (var i = 0; i < dataset.length; i++) {
@@ -79,11 +84,11 @@
 					}
 				}
 
-				var scorePartitions = {}
+				var numPartitions = 10;
 				scoreTypes.forEach(function(scoreType) {
 					var hist = d3.layout.histogram()
 						.range([0, 1])
-						.bins(10)
+						.bins(numPartitions)
 						.value(function(d) {
 							return d[scoreType.toLowerCase()];
 						})(dataset);
@@ -94,24 +99,21 @@
 						count += bin.length;
 					});
 
-					scorePartitions[scoreType.toLowerCase()] = hist; 
+					svg.append("g").selectAll("rect")
+						.data(hist)
+						.enter().append("rect")
+						.attr("width", x.rangeBand())
+						.attr("height", function(d) {
+							return y(100 * (1 - d.length / dataset.length));
+						})
+						.attr("x", x(scoreType))
+						.attr("y", function(d) {
+							return y(100 * (d.length + d.lower) / dataset.length);
+						})
+						.attr("fill", function(d, i) {
+							return d3.rgb(color((i + 0.5) / numPartitions));
+						});
 				});
-
-				/*
-				svg.selectAll("rect")
-					.data(scorePartitions)
-					.enter().append("rect")
-					.attr("width", 10)
-					.attr("height", 10)
-					.attr("x", function(d, i) {
-						return i * 10;
-					})
-					.attr("y", function(d, i) {
-						return i * 10;
-					});
-				*/
-					
-				console.log(scorePartitions);
 			});
 	
 			function zoomed() {
