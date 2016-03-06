@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Project Part B</title>
+		<script src="d3.v3.min.js" charset="utf-8"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var width = 960;
+			var height = 500;
+	
+			var div = d3.select("body").append("div")
+				.style("width", width + "px")
+				.style("height", height + "px")
+				.style("margin", "auto")
+				.style("display", "block")
+				.style("border", "1px solid");
+	
+			var zoom = d3.behavior.zoom()
+					.scaleExtent([1, 8])
+					.on("zoom", zoomed);
+				
+			var svg = div.append("svg")
+				.attr("width", width)
+				.attr("height", height)
+				.attr("align", "center")
+				.style("margin", "auto")
+				.style("display", "block")
+				.call(zoom)
+				.append("g")
+	
+			var scoreTypes = ["Tarantula", "SBI", "Jaccard", "Ochiai"];
+	
+			var color = d3.scale.linear()
+				.domain([0, 0.5, 1])
+				.range(["green", "yellow", "red"]);
+	
+			d3.csv("scores.csv", function(dataset) {
+				for (var i = 0; i < dataset.length; i++) {
+					if (dataset[i].class.match(/^java/) || dataset[i].class.match(/^org\/w3c/)) {
+						dataset.splice(i--, 1);
+						continue;
+					}
+				}
+
+				var scorePartitions = {}
+				scoreTypes.forEach(function(scoreType) {
+					scorePartitions[scoreType.toLowerCase()] = d3.layout.histogram()
+					.range([0, 1])
+					.bins(10)
+					.value(function(d) {
+						return d[scoreType.toLowerCase()];
+					})(dataset);
+				});
+
+				/*
+				svg.selectAll("rect")
+					.data(scorePartitions)
+					.enter().append("rect")
+					.attr("width", 10)
+					.attr("height", 10)
+					.attr("x", function(d, i) {
+						return i * 10;
+					})
+					.attr("y", function(d, i) {
+						return i * 10;
+					});
+				*/
+					
+				console.log(scorePartitions);
+			});
+	
+			function zoomed() {
+				var tx = Math.min(0, Math.max(d3.event.translate[0], width - width * d3.event.scale));
+				var ty = Math.min(0, Math.max(d3.event.translate[1], height - height * d3.event.scale));
+				zoom.translate([tx, ty]);
+				svg.attr("transform", "translate(" + [tx, ty] + ")" + " scale(" + d3.event.scale + ")");
+			}
+		</script>
+	</body>
+</html>   
