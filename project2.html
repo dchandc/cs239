@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+	<style>
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: #000;
+			shape-rendering: crispEdges;
+		}
+	</style>
 	<head>
 		<meta charset="utf-8">
 		<title>Project Part B</title>
@@ -9,6 +17,9 @@
 		<script type="text/javascript">
 			var width = 960;
 			var height = 500;
+			var margin = {top: 20, right: 20, bottom: 30, left: 40};
+			var graphWidth = width - margin.left - margin.right;
+			var graphHeight = height - margin.top - margin.bottom;
 	
 			var div = d3.select("body").append("div")
 				.style("width", width + "px")
@@ -26,12 +37,39 @@
 				.attr("height", height)
 				.call(zoom)
 				.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+				.append("g");
 	
 			var scoreTypes = ["Tarantula", "SBI", "Jaccard", "Ochiai"];
 	
 			var color = d3.scale.linear()
 				.domain([0, 0.5, 1])
 				.range(["green", "yellow", "red"]);
+
+			var x = d3.scale.ordinal()
+				.rangeRoundBands([0, graphWidth], .1)
+				.domain(scoreTypes);
+
+			var y = d3.scale.linear()
+				.domain([0, 100])
+				.range([graphHeight, 0]);
+
+			var xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom");
+
+			var yAxis = d3.svg.axis()
+				.scale(y)
+				.orient("left")
+
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + graphHeight + ")")
+				.call(xAxis);
+
+			svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis);
 	
 			d3.csv("scores.csv", function(dataset) {
 				for (var i = 0; i < dataset.length; i++) {
