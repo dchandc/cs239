@@ -10,14 +10,25 @@
 			stroke: #000;
 			shape-rendering: crispEdges;
 		}
+		.d3-tip {
+			line-height: 1;
+			padding: 10px;
+			background: rgba(0, 0, 0, 0.75);
+			color: #fff;
+			border-radius: 2px;
+			font-size: 12px;
+			font-family: sans-serif;
+		}
 	</style>
 	<head>
 		<meta charset="utf-8">
 		<title>Score Partitions</title>
 		<script src="d3.v3.min.js" charset="utf-8"></script>
+		<script src="d3-tip.min.js" charset="utf-8"></script>
 	</head>
 	<body>
 		<script type="text/javascript">
+			var numPartitions = 10;
 			var width = 960;
 			var height = 500;
 			var margin = {top: 20, right: 20, bottom: 30, left: 40};
@@ -41,11 +52,19 @@
 			var zoom = d3.behavior.zoom()
 					.scaleExtent([1, 8])
 					.on("zoom", zoomed);
+
+			var tip = d3.tip()
+				.attr("class", "d3-tip")
+				.direction("e")
+				.html(function(d, i) {
+					return "Partition: " + (i + 1) + "<br>Score range: " + (i / numPartitions).toFixed(2) + "-" + ((i + 1) / numPartitions).toFixed(2) + "<br>Method count: " + d.length;
+				});
 				
 			var svg = div.append("svg")
 				.attr("width", width)
 				.attr("height", height)
 				.call(zoom)
+				.call(tip)
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 				.append("g");
@@ -91,7 +110,6 @@
 					}
 				}
 
-				var numPartitions = 10;
 				scoreTypes.forEach(function(scoreType) {
 					var hist = d3.layout.histogram()
 						.range([0, 1])
@@ -119,7 +137,9 @@
 						})
 						.attr("fill", function(d, i) {
 							return d3.rgb(color((i + 0.5) / numPartitions));
-						});
+						})
+						.on("mouseover", tip.show)
+						.on("mouseout", tip.hide);
 				});
 			});
 	

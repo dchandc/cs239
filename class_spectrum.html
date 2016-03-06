@@ -31,13 +31,6 @@
 				.append("text")
 				.text("Class Spectrum")
 				.style("font", "14px sans-serif")
-
-			var tip = d3.tip()
-				.attr("class", "d3-tip")
-				.direction('se')
-				.html(function(d) {
-					return "Class: " + d.class + "<br>Method: " + d.method + "<br>Passed: " + d.num_passed + "/" + d.total_passed + "<br>Failed: " + d.num_failed + "/" + d.total_failed + "<br>Tarantula score: " + d.tarantula + "<br>SBI score: " + d.sbi + "<br>Jaccard score: " + d.jaccard + "<br>Ochiai score: " + d.ochiai;
-				});
 	
 			var div = d3.select("body").append("div")
 				.style("width", width + "px")
@@ -49,6 +42,13 @@
 			var zoom = d3.behavior.zoom()
 					.scaleExtent([1, 8])
 					.on("zoom", zoomed);
+
+			var tip = d3.tip()
+				.attr("class", "d3-tip")
+				.direction("se")
+				.html(function(d) {
+					return "Class: " + d.class + "<br>Method: " + d.method + "<br>Passed: " + d.num_passed + "/" + d.total_passed + "<br>Failed: " + d.num_failed + "/" + d.total_failed + "<br>Tarantula score: " + d.tarantula + "<br>SBI score: " + d.sbi + "<br>Jaccard score: " + d.jaccard + "<br>Ochiai score: " + d.ochiai;
+				});
 				
 			var svg = div.append("svg")
 				.attr("width", width)
@@ -96,7 +96,7 @@
 					maxMethodCount = Math.max(maxMethodCount, classes[key].length);
 				}
 	
-				var initialScoreType = 'tarantula';
+				var initialScoreType = "tarantula";
 				var classIndex = 0;
 				for (var key in classes) {
 					classes[key].sort(function(a, b) {
