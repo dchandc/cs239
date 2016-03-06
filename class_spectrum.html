@@ -30,7 +30,7 @@
 				.style("text-align", "center")
 				.append("text")
 				.text("Class Spectrum")
-				.style("font", "14px sans-serif")
+				.style("font", "14px sans-serif");
 	
 			var div = d3.select("body").append("div")
 				.style("width", width + "px")
@@ -55,19 +55,19 @@
 				.attr("height", height)
 				.call(zoom)
 				.call(tip)
-				.append("g")
+				.append("g");
 	
 			var buttonDiv = d3.select("body").append("div")
 				.style("width", width + "px")
 				.style("height", "20px")
 				.style("margin", "auto")
-				.style("text-align", "center")
+				.style("text-align", "center");
 	
 			var scoreTypes = ["Tarantula", "SBI", "Jaccard", "Ochiai"];
 			for (var i = 0; i < scoreTypes.length; i++) {
 				buttonDiv.append("button")
 					.text(scoreTypes[i])
-					.attr("onclick", 'update("' + scoreTypes[i].toLowerCase() + '")')
+					.attr("onclick", 'update("' + scoreTypes[i].toLowerCase() + '")');
 			}
 	
 			var color = d3.scale.linear()
@@ -162,7 +162,7 @@
 						.ease("linear")
 						.attr("fill", function(d, i) {
 							return d3.rgb(color(d[scoreType]));
-						})
+						});
 					
 					classIndex++;
 				}

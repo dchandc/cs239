@@ -40,7 +40,7 @@
 				.style("text-align", "center")
 				.append("text")
 				.text("Score Partitions")
-				.style("font", "14px sans-serif")
+				.style("font", "14px sans-serif");
 	
 			var div = d3.select("body").append("div")
 				.style("width", width + "px")
@@ -89,18 +89,18 @@
 
 			var yAxis = d3.svg.axis()
 				.scale(y)
-				.orient("left")
+				.orient("left");
 
 			svg.append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + graphHeight + ")")
-				.call(xAxis)
+				.call(xAxis);
 
 			svg.append("g")
 				.attr("class", "y axis")
 				.call(yAxis)
 				.append("text")
-				.text("%")
+				.text("%");
 	
 			d3.csv("scores.csv", function(dataset) {
 				for (var i = 0; i < dataset.length; i++) {
