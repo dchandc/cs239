@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<style>
+		body {
+			font: 12px sans-serif;
+		}
+		.d3-tip {
+			line-height: 1;
+			padding: 10px;
+			background: rgba(0, 0, 0, 0.75);
+			color: #fff;
+			border-radius: 2px;
+			font-size: 12px;
+			font-family: sans-serif;
+		}
+	</style>
+	<head>
+		<meta charset="utf-8">
+		<title>Top Methods</title>
+		<script src="d3.v3.min.js" charset="utf-8"></script>
+		<script src="d3-tip.min.js" charset="utf-8"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var numMethods = 10;
+			var width = 960;
+			var height = 500;
+
+			var titleDiv = d3.select("body").append("div")
+				.style("display", "block")
+				.style("text-align", "center")
+				.append("text")
+				.text("Top Methods")
+				.style("font", "14px sans-serif");
+	
+			var div = d3.select("body").append("div")
+				.style("width", width + "px")
+				.style("height", height + "px")
+				.style("margin", "auto")
+				.style("display", "block")
+				.style("border", "1px solid");
+
+			var tip = d3.tip()
+				.attr("class", "d3-tip")
+				.direction("se")
+				.html(function(d) {
+					return "hello";
+				});
+				
+			var svg = div.append("svg")
+				.attr("width", width)
+				.attr("height", height)
+				.call(tip)
+				.append("g");
+	
+			var scoreTypes = ["Tarantula", "SBI", "Jaccard", "Ochiai"];
+
+			var buttonDiv = d3.select("body").append("div")
+				.style("width", width + "px")
+				.style("height", "20px")
+				.style("margin", "auto")
+				.style("text-align", "center");
+	
+			buttonDiv.append("text")
+				.text("Sort by: ")
+
+			for (var i = 0; i < scoreTypes.length; i++) {
+				buttonDiv.append("button")
+					.text(scoreTypes[i])
+					.attr("onclick", 'update("' + scoreTypes[i].toLowerCase() + '")');
+			}
+	
+			var color = d3.scale.linear()
+				.domain([0, 0.5, 1])
+				.range(["green", "yellow", "red"]);
+
+			var fields = ["Class", "Method"].concat(scoreTypes);
+
+			var x = d3.scale.linear()
+				.domain([0, fields.length - 1])
+				.range([width * (0.5 / fields.length), width * (1 - 0.5 / fields.length)]);
+
+			var y = d3.scale.linear()
+				.domain([0, numMethods])
+				.range([height * (0.5 / numMethods), height * (1 - 0.5 / numMethods)]);
+
+			var fieldsGroup = svg.append("g");
+			fields.forEach(function(field, index) {
+				svg.append("text")
+					.text(field)
+					.attr("x", x(index))
+					.attr("y", y(0))
+					.attr("text-anchor", "middle")
+			});
+	
+			d3.csv("scores.csv", function(dataset) {
+				for (var i = 0; i < dataset.length; i++) {
+					if (dataset[i].class.match(/^java/) || dataset[i].class.match(/^org\/w3c/)) {
+						dataset.splice(i--, 1);
+						continue;
+					}
+				}
+
+				var initialScoreType = "tarantula";
+				dataset.sort(function(a, b) {
+					var scoreA = a[initialScoreType];
+					var scoreB = b[initialScoreType];
+					if (scoreA < scoreB) {
+						return 1;
+					} else if (scoreA > scoreB) {
+						return -1;
+					} else {
+						return 0;
+					}
+				});
+
+				console.log(dataset);	
+			});
+	
+			function update(scoreType) {
+				dataset.sort(function(a, b) {
+					var scoreA = a[scoreType];
+					var scoreB = b[scoreType];
+					if (scoreA < scoreB) {
+						return 1;
+					} else if (scoreA > scoreB) {
+						return -1;
+					} else {
+						return 0;
+					}
+				});
+			}
+		</script>
+	</body>
+</html>   
