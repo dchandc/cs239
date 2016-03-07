@@ -158,7 +158,6 @@
 			});
 	
 			function update(scoreType) {
-				console.log(filteredDataset);
 				filteredDataset.sort(function(a, b) {
 					var scoreA = a[scoreType];
 					var scoreB = b[scoreType];
@@ -170,6 +169,33 @@
 						return 0;
 					}
 				});
+
+				for (var i = 0; i < numMethods; i++) {
+					var methodGroup = svg.select('g[id="method' + i + '"]');
+
+					var methodInfoArray = [
+						{id: "class", text: filteredDataset[i]["class"]},
+						{id: "method", text: filteredDataset[i]["method"]},
+						{id: "passed", text: filteredDataset[i]["num_passed"] + "/" + filteredDataset[i]["total_passed"]},
+						{id: "failed", text: filteredDataset[i]["num_failed"] + "/" + filteredDataset[i]["total_failed"]}
+					]
+
+					methodInfoArray.forEach(function(methodInfo, index) {
+						methodGroup.select('text[id="' + methodInfo["id"] + '"]')
+							.text(methodInfo["text"])
+						});
+
+					scoreTypes.forEach(function(scoreType, index) {
+						methodGroup.select('rect[id="' + scoreType.toLowerCase() + '"]').data([filteredDataset[i][scoreType.toLowerCase()]])
+							.transition()
+							.delay(0)
+							.duration(500)
+							.ease("linear")
+							.attr("fill", function(d) {
+								return d3.rgb(color(d));
+							});
+					});
+				}
 			}
 		</script>
 	</body>
