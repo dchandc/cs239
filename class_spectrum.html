@@ -57,13 +57,17 @@
 				.call(tip)
 				.append("g");
 	
+			var scoreTypes = ["Tarantula", "SBI", "Jaccard", "Ochiai"];
+
 			var buttonDiv = d3.select("body").append("div")
 				.style("width", width + "px")
 				.style("height", "20px")
 				.style("margin", "auto")
 				.style("text-align", "center");
+
+			buttonDiv.append("text")
+				.text("Sort by: ")
 	
-			var scoreTypes = ["Tarantula", "SBI", "Jaccard", "Ochiai"];
 			for (var i = 0; i < scoreTypes.length; i++) {
 				buttonDiv.append("button")
 					.text(scoreTypes[i])
