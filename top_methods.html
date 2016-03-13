@@ -43,9 +43,9 @@
 
 			var tip = d3.tip()
 				.attr("class", "d3-tip")
-				.direction("se")
+				.direction("e")
 				.html(function(d) {
-					return "hello";
+					return d;
 				});
 				
 			var svg = div.append("svg")
@@ -118,7 +118,15 @@
 					} else if (scoreA > scoreB) {
 						return -1;
 					} else {
-						return 0;
+						var methodNameA = a['method'];
+						var methodNameB = b['method'];
+						if (methodNameA > methodNameB) {
+							return 1;
+						} else if (methodNameA < methodNameB) {
+							return -1;
+						} else {
+							return 0;
+						}
 					}
 				});
 
@@ -151,8 +159,10 @@
 							.attr("width", 2 * blockSize)
 							.attr("height", blockSize)
 							.attr("fill", function(d) {
-								return d3.rgb(color(d));
-							});
+								return d3.rgb(color(d))
+							})
+							.on("mouseover", tip.show)
+							.on("mouseout", tip.hide);
 					});
 				}
 			});
@@ -166,7 +176,15 @@
 					} else if (scoreA > scoreB) {
 						return -1;
 					} else {
-						return 0;
+						var methodNameA = a['method'];
+						var methodNameB = b['method'];
+						if (methodNameA > methodNameB) {
+							return 1;
+						} else if (methodNameA < methodNameB) {
+							return -1;
+						} else {
+							return 0;
+						}
 					}
 				});
 
