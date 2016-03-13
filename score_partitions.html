@@ -57,7 +57,7 @@
 				.attr("class", "d3-tip")
 				.direction("e")
 				.html(function(d, i) {
-					return "Partition: " + (i + 1) + "<br>Score range: " + (i / numPartitions).toFixed(2) + "-" + ((i + 1) / numPartitions).toFixed(2) + "<br>Method count: " + d.length;
+					return "Partition: " + (i + 1) + "<br>Score range: " + (i / numPartitions).toFixed(2) + "-" + ((i + 1) / numPartitions).toFixed(2) + "<br>Method count: " + d.length + "<br>Percent: " + (100 * d.length / d.total).toFixed(2);
 				});
 				
 			var svg = div.append("svg")
@@ -121,6 +121,7 @@
 					var count = 0;
 					hist.forEach(function(bin) {
 						bin.lower = count;
+						bin.total = dataset.length;
 						count += bin.length;
 					});
 
